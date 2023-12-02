@@ -38,6 +38,8 @@ class _TransectDetailsState extends State<TransectDetails> {
   TextEditingController dryController = TextEditingController();
   TextEditingController centerController = TextEditingController();
   TextEditingController wetController = TextEditingController();
+  TextEditingController lengthwetController = TextEditingController();
+  TextEditingController lengthdryController = TextEditingController();
 
   /*
   serviceEnabled and permissionGranted are used
@@ -103,12 +105,12 @@ class _TransectDetailsState extends State<TransectDetails> {
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           // color: Colors.black38,
-          color: darkBlue,
+          color: Colors.white,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Center(
-                child: LoadingAnimationWidget.dotsTriangle(
+                child: LoadingAnimationWidget.threeRotatingDots(
                   size: 50,
                   color: Colors.blue,
                 ),
@@ -134,11 +136,12 @@ class _TransectDetailsState extends State<TransectDetails> {
     OverlayLoadingProgress.stop();
   }
 
-  double distanceInMeters = 0.0;
+  var distanceInMeters;
   var splitagStart, splitagEnd;
 
   // This function is triggered when the floating buttion is pressed
   void _show(BuildContext context) {
+    var Screensize = MediaQuery.of(context).size.width;
     showModalBottomSheet(
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(30.0)),
@@ -151,184 +154,230 @@ class _TransectDetailsState extends State<TransectDetails> {
                   top: 25,
                   left: 25,
                   right: 25,
+
                   bottom: MediaQuery.of(context).viewInsets.bottom + 15),
-              child: Form(
-                  key: _dropdownFormKey,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      const Center(
-                          child: Text(
-                        'Transect Details',
-                        style: TextStyle(
-                            //color: Colors.white,
-                            fontFamily: 'ProximaNova',
-                            fontWeight: FontWeight.bold,
-                            //fontStyle: FontStyle.italic,
-                            fontSize: 20.0),
-                      )),
-                      const SizedBox(
-                        height: 30,
-                      ),
-                      DropdownButtonFormField(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Form(
+                    key: _dropdownFormKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        const Center(
+                            child: Text(
+                          'Transect Details',
+                          style: TextStyle(
+                              //color: Colors.white,
+                              fontFamily: 'ProximaNova',
+                              fontWeight: FontWeight.bold,
+                              //fontStyle: FontStyle.italic,
+                              fontSize: 20.0),
+                        )),
+                        const SizedBox(
+                          height: 30,
+                        ),
+                        DropdownButtonFormField(
+                            decoration: InputDecoration(
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(
+                                    color: Colors.blue, width: 2),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              border: OutlineInputBorder(
+                                borderSide: const BorderSide(
+                                    color: Colors.blue, width: 2),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              filled: true,
+                              fillColor: Colors.transparent,
+                            ),
+                            validator: (value) => value == "Select Transect"
+                                ? "Select a transect"
+                                : null,
+                            //dropdownColor: Colors.blueAccent,
+                            value: selectedValue,
+                            icon: const Icon(Icons.keyboard_arrow_down),
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                selectedValue = newValue!;
+                              });
+                            },
+                            items: dropdownItems),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        TextField(
+                          controller: dryController,
+                          readOnly: true,
+                          keyboardType: TextInputType.name,
                           decoration: InputDecoration(
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                  color: Colors.blue, width: 2),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            border: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                  color: Colors.blue, width: 2),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            filled: true,
-                            fillColor: Colors.transparent,
-                          ),
-                          validator: (value) => value == "Select Transect"
-                              ? "Select a transect"
-                              : null,
-                          //dropdownColor: Colors.blueAccent,
-                          value: selectedValue,
-                          icon: const Icon(Icons.keyboard_arrow_down),
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              selectedValue = newValue!;
-                            });
-                          },
-                          items: dropdownItems),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      TextField(
-                        controller: dryController,
-                        readOnly: true,
-                        keyboardType: TextInputType.name,
-                        decoration: InputDecoration(
-                          labelText: 'Start Dry',
-                          suffixIcon: IconButton(
-                            onPressed: () {
-                              _getUserLocation();
-                              gpsTextField = 1;
-                              if (gpsTextField == 1) {
-                                dryController.text =
-                                    'lat: ${_userLocation?.latitude} , long: ${_userLocation?.longitude}';
-                              }
-                            },
-                            icon: const Icon(
-                              Icons.wb_sunny_outlined,
+                            labelText: 'Start Dry',
+                            suffixIcon: IconButton(
+                              onPressed: () {
+                                _getUserLocation();
+                                gpsTextField = 1;
+                                if (gpsTextField == 1) {
+                                  dryController.text =
+                                      'lat: ${_userLocation?.latitude} , long: ${_userLocation?.longitude}';
+                                }
+                              },
+                              icon: const Icon(
+                                Icons.wb_sunny_outlined,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(
-                        height: 30,
-                      ),
-                      TextField(
-                        controller: centerController,
-                        readOnly: true,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          labelText: 'End Dry / Start Wet',
-                          suffixIcon: IconButton(
-                            onPressed: () {
-                              _getUserLocation();
-                              gpsTextField = 2;
-                              if (gpsTextField == 2) {
-                                centerController.text =
-                                    'lat: ${_userLocation?.latitude} , long: ${_userLocation?.longitude}';
-                              }
-                            },
-                            icon: const Icon(
-                              Icons.share_location,
+                        const SizedBox(
+                          height: 30,
+                        ),
+                        TextField(
+                          controller: centerController,
+                          readOnly: true,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: 'End Dry / Start Wet',
+                            suffixIcon: IconButton(
+                              onPressed: () {
+                                _getUserLocation();
+                                gpsTextField = 2;
+                                if (gpsTextField == 2) {
+                                  centerController.text =
+                                      'lat: ${_userLocation?.latitude} , long: ${_userLocation?.longitude}';
+                                }
+                              },
+                              icon: const Icon(
+                                Icons.share_location,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(
-                        height: 30,
-                      ),
-                      TextField(
-                        controller: wetController,
-                        readOnly: true,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          labelText: 'End Wet',
-                          suffixIcon: IconButton(
-                            onPressed: () {
-                              _getUserLocation();
-                              gpsTextField = 3;
-                              if (gpsTextField == 3) {
-                                wetController.text =
-                                    'lat: ${_userLocation?.latitude} , long: ${_userLocation?.longitude}';
-                              }
-                            },
-                            icon: const Icon(
-                              Icons.water_drop_outlined,
+                        const SizedBox(
+                          height: 30,
+                        ),
+                        TextField(
+                          controller: wetController,
+                          readOnly: true,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: 'End Wet',
+                            suffixIcon: IconButton(
+                              onPressed: () {
+                                _getUserLocation();
+                                gpsTextField = 3;
+                                if (gpsTextField == 3) {
+                                  wetController.text =
+                                      'lat: ${_userLocation?.latitude} , long: ${_userLocation?.longitude}';
+                                }
+                              },
+                              icon: const Icon(
+                                Icons.water_drop_outlined,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(
-                        height: 30,
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: ElevatedButton(
-                                onPressed: () {
-                                  _getUserLocation();
-                                  //addItemToList();
-                                  if (_dropdownFormKey.currentState!
-                                      .validate()) {
-                                    Future.delayed(Duration.zero, () async {
-                                      loader();
-                                    });
-
-                                    splitagStart =
-                                        dryController.text.split(",");
-                                    splitagEnd = dryController.text.split(",");
-
-                                    // print('${splitagStart[0].substring(5)} ${splitagStart[1].substring(7)}');
-                                    // print('${splitagEnd[0].substring(5)} ${splitagEnd[1].substring(7)}');
-
-                                    distanceInMeters =
-                                        Geolocator.distanceBetween(
-                                            double.parse(
-                                                splitagStart[0].substring(5)),
-                                            double.parse(
-                                                splitagStart[1].substring(7)),
-                                            double.parse(
-                                                splitagEnd[0].substring(5)),
-                                            double.parse(
-                                                splitagEnd[1].substring(7)));
-                                    //print(distanceInMeters);
-                                    addData();
-
-                                    //valid flow
-                                    Navigator.pop(
-                                      context,
-                                      "This string will be passed back to the parent",
-                                    );
-
-                                    setState(() {
-                                      selectedValue = "Select Transect";
-                                      dryController.text = '';
-                                      centerController.text = '';
-                                      wetController.text = '';
-                                    });
-                                  }
-                                },
-                                child: const Text("Submit")),
+                        const SizedBox(
+                          height: 30,
+                        ),
+                        TextField(
+                          controller: lengthwetController,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: 'Enter wet distance(Wet transect length)',
+                            suffixIcon: IconButton(
+                              onPressed: () {
+                                lengthwetController.clear();
+                              },
+                              icon: const Icon(
+                                Icons.social_distance,
+                              ),
+                            ),
                           ),
-                        ],
-                      )
-                    ],
-                  )),
+                        ),
+                        const SizedBox(
+                          height: 30,
+                        ),
+                        TextField(
+                          controller: lengthdryController,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: 'Enter dry distance(Dry transect length)',
+                            suffixIcon: IconButton(
+                              onPressed: () {
+                                lengthdryController.clear();
+                              },
+                              icon: const Icon(
+                                Icons.social_distance,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 30,
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: ElevatedButton(
+                                  onPressed: () {
+                                    _getUserLocation();
+                                    //addItemToList();
+                                    if (_dropdownFormKey.currentState!
+                                        .validate()) {
+                                      Future.delayed(Duration.zero, () async {
+                                        loader();
+                                      });
+
+                                      splitagStart =
+                                          dryController.text.split(",");
+                                      splitagEnd = dryController.text.split(",");
+
+                                      // print('${splitagStart[0].substring(5)} ${splitagStart[1].substring(7)}');
+                                      // print('${splitagEnd[0].substring(5)} ${splitagEnd[1].substring(7)}');
+
+                                      // distanceInMeters =
+                                      //     Geolocator.distanceBetween(
+                                      //         double.parse(
+                                      //             splitagStart[0].substring(5)),
+                                      //         double.parse(
+                                      //             splitagStart[1].substring(7)),
+                                      //         double.parse(
+                                      //             splitagEnd[0].substring(5)),
+                                      //         double.parse(
+                                      //             splitagEnd[1].substring(7)));
+
+                                      distanceInMeters = 'Wet: ${lengthwetController.text} m, Dry: ${lengthdryController.text}';
+
+                                      //print(distanceInMeters);
+                                      addData();
+
+                                      //valid flow
+                                      Navigator.pop(
+                                        context,
+                                        "This string will be passed back to the parent",
+                                      );
+
+                                      setState(() {
+                                        selectedValue = "Select Transect";
+                                        dryController.text = '';
+                                        centerController.text = '';
+                                        wetController.text = '';
+                                      });
+                                    }
+                                  },
+                                  child: const Text("Submit")),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 30,
+                        ),
+                      ],
+                    )),
+              ),
             ));
   }
 
@@ -338,6 +387,7 @@ class _TransectDetailsState extends State<TransectDetails> {
       'beachID': widget.beachID,
     });
 
+    //print(response.body);
     return json.decode(response.body);
   }
 
@@ -349,6 +399,7 @@ class _TransectDetailsState extends State<TransectDetails> {
       'centergps': centerController.text,
       'endgps': wetController.text,
       'beachID': widget.beachID,
+      'distance': distanceInMeters,
     });
     //print('${controllerCounty.text} ${controllerBeach.text}');
   }
@@ -365,7 +416,7 @@ class _TransectDetailsState extends State<TransectDetails> {
           ),
           onPressed: () {
             Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => const CountyDetails()));
+                MaterialPageRoute(builder: (context) => const CountyDetails(email: '',)));
             //print(countyTag);
           },
         ),
@@ -393,13 +444,25 @@ class _TransectDetailsState extends State<TransectDetails> {
         builder: ((context, snapshot) {
           if (snapshot.hasError) {
             //print('error');
+            return Center(
+              child: Column(
+                children: [
+                  Image.network(
+                    "https://mspwarehouse.s3.amazonaws.com/bin.gif",
+                    height: 125.0,
+                    width: 125.0,
+                  ),
+                  const Text('Someting went wrong\nMake sure you have an Internet Connection',textAlign: TextAlign.center,style: TextStyle(color: Colors.red),),
+                ],
+              ),
+            );
           }
           if (snapshot.hasData) {
             return TransectItems(
                 list: snapshot.data ?? [],
                 countyTag: widget.countyTag,
                 beachID: widget.beachID,
-                distanceInMeters: distanceInMeters);
+                distanceInMeters: distanceInMeters ?? '');
           } else {
             return const Center(child: CircularProgressIndicator());
           }
@@ -414,7 +477,7 @@ class TransectItems extends StatelessWidget {
   final String countyTag;
   final String beachID;
 
-  final double distanceInMeters;
+  final String distanceInMeters;
 
   TransectItems(
       {Key? key,
@@ -428,204 +491,210 @@ class TransectItems extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double baseWidth = 375;
+    double fem = MediaQuery.of(context).size.width / baseWidth;
+    double ffem = fem * 0.97;
     if (list.isEmpty) {
       return const Center(
         child: Text('Press the + button to add a transect'),
       );
     } else {
-      return ListView.separated(
-        itemCount: list.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            visualDensity: const VisualDensity(vertical: 4),
-            leading: CircleAvatar(
-              radius: 25,
-              backgroundColor: Colors.grey,
-              child: Center(
-                  child: Text(
-                list[index]['transect'],
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontFamily: 'ProximaNova',
-                  fontWeight: FontWeight.bold,
-                  fontStyle: FontStyle.italic,
-                  color: Colors.white,
-                ),
-              )),
-            ),
-            title: Text(
-              'Transect ${list[index]['transect'].substring(1, 2)}',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 18,
-                fontFamily: 'ProximaNova',
-                //fontWeight: FontWeight.bold,
-                fontStyle: FontStyle.italic,
-                color: Colors.white,
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 70.0),
+        child: ListView.separated(
+          itemCount: list.length,
+          itemBuilder: (context, index) {
+            return ListTile(
+              visualDensity: const VisualDensity(vertical: 4),
+              leading: CircleAvatar(
+                radius: 25,
+                backgroundColor: Colors.grey,
+                child: Center(
+                    child: Text(
+                  list[index]['transect'],
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontFamily: 'ProximaNova',
+                    fontWeight: FontWeight.bold,
+                    fontStyle: FontStyle.italic,
+                    color: Colors.white,
+                  ),
+                )),
               ),
-            ),
-            trailing: Wrap(spacing: -5, children: [
-              IconButton(
+              title: Text(
+                'Transect ${list[index]['transect'].substring(1, 2)}',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontFamily: 'ProximaNova',
+                  //fontWeight: FontWeight.bold,
+                  fontStyle: FontStyle.italic,
+                  color: Colors.black,
+                ),
+              ),
+              trailing: Wrap(spacing: -5, children: [
+                IconButton(
+                    icon: const Icon(
+                      Icons.wb_sunny_outlined,
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => KCategory(
+                                selectedTransectZoneTag:
+                                    'Transect ${list[index]['transect'].substring(1, 2)} > Dry',
+                                selectedTransectTag: 'Transect ${index + 1}',
+                                transectID: list[index]['transect'],
+                                countyID: countyTag,
+                                beachID: beachID,
+                                distanceInMeters:  list[index]['distance'] ?? '',
+                                startDryGPS: list[index]['startgps'],
+                                centerGPS: list[index]['centergps'],
+                                endWetGPS: list[index]['endgps'],
+                              )));
+                      //print(list[index]['distance']);
+                    }),
+                IconButton(
                   icon: const Icon(
-                    Icons.wb_sunny_outlined,
+                    Icons.water_drop_outlined,
                   ),
                   onPressed: () {
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => KCategory(
                               selectedTransectZoneTag:
-                                  'Transect ${list[index]['transect'].substring(1, 2)} > Dry',
+                                  'Transect ${list[index]['transect'].substring(1, 2)} > Wet',
                               selectedTransectTag: 'Transect ${index + 1}',
                               transectID: list[index]['transect'],
                               countyID: countyTag,
                               beachID: beachID,
-                              distanceInMeters: distanceInMeters,
+                              distanceInMeters:   list[index]['distance'] ?? '',
                               startDryGPS: list[index]['startgps'],
                               centerGPS: list[index]['centergps'],
                               endWetGPS: list[index]['endgps'],
                             )));
                     //print(countyTag);
-                  }),
-              IconButton(
-                icon: const Icon(
-                  Icons.water_drop_outlined,
+                  },
                 ),
-                onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => KCategory(
-                            selectedTransectZoneTag:
-                                'Transect ${list[index]['transect'].substring(1, 2)} > Wet',
-                            selectedTransectTag: 'Transect ${index + 1}',
-                            transectID: list[index]['transect'],
-                            countyID: countyTag,
-                            beachID: beachID,
-                            distanceInMeters: distanceInMeters,
-                            startDryGPS: list[index]['startgps'],
-                            centerGPS: list[index]['centergps'],
-                            endWetGPS: list[index]['endgps'],
-                          )));
-                  //print(countyTag);
-                },
-              ),
-              IconButton(
-                icon: const Icon(
-                  Icons.delete_forever,
-                  color: Colors.blueAccent,
-                ),
-                // onPressed: () {
-                //
-                // },
-                onPressed: () => showDialog<String>(
-                  context: context,
-                  builder: (BuildContext context) => AlertDialog(
-                    title: const Text(
-                      'Warning',
-                      textAlign: TextAlign.center,
-                    ),
-                    content: Text(
-                      'Are you sure you want to delete \n${list[index]['transect']}',
-                      textAlign: TextAlign.center,
-                    ),
-                    actions: <Widget>[
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextButton(
-                              onPressed: () {
-                                Navigator.pop(context, 'Cancel');
-                              },
-                              child: const Text('Cancel'),
-                            ),
-                          ),
-                          Expanded(
-                            child: TextButton(
-                              onPressed: () {
-                                Navigator.pop(context, 'Yes');
-                                showDialog<String>(
-                                    context: context,
-                                    builder: (BuildContext context) =>
-                                        AlertDialog(
-                                          title: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              const Text(
-                                                'Verify Action !',
-                                                style: TextStyle(
-                                                    color: Colors.blueAccent,
-                                                    fontFamily: 'ProximaNova',
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 20.0),
-                                              ),
-                                              IconButton(
-                                                icon: const Icon(
-                                                  Icons.close_outlined,
-                                                ),
-                                                onPressed: () {
-                                                  Navigator.pop(context, 'Yes');
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                          content: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              TextField(
-                                                controller:
-                                                    _inputTextController,
-                                                decoration:
-                                                    const InputDecoration(
-                                                        hintText: "Confirm"),
-                                                onChanged: (value) {
-                                                  if (value.toTitleCase() ==
-                                                      'Confirm') {
-                                                    _inputTextController
-                                                        .clear();
-
-                                                    var url =
-                                                        "http://$ipAddress/sdg/transect/deletedata.php";
-                                                    http.post(Uri.parse(url),
-                                                        body: {
-                                                          'id': list[index]
-                                                              ['id'],
-                                                        });
-                                                    Navigator.pop(context);
-                                                    Navigator.of(context)
-                                                        .pushReplacement(
-                                                      MaterialPageRoute(
-                                                        builder: (BuildContext
-                                                                context) =>
-                                                            TransectDetails(
-                                                          countyTag: countyTag,
-                                                          beachID: beachID,
-                                                        ),
-                                                      ),
-                                                    );
-                                                  }
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                        ));
-                              },
-                              child: const Text('Yes'),
-                            ),
-                          ),
-                        ],
+                IconButton(
+                  icon: const Icon(
+                    Icons.delete_forever,
+                    color: Colors.blueAccent,
+                  ),
+                  // onPressed: () {
+                  //
+                  // },
+                  onPressed: () => showDialog<String>(
+                    context: context,
+                    builder: (BuildContext context) => AlertDialog(
+                      title: const Text(
+                        'Warning',
+                        textAlign: TextAlign.center,
                       ),
-                    ],
+                      content: Text(
+                        'Are you sure you want to delete \n${list[index]['transect']}',
+                        textAlign: TextAlign.center,
+                      ),
+                      actions: <Widget>[
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context, 'Cancel');
+                                },
+                                child: const Text('Cancel'),
+                              ),
+                            ),
+                            Expanded(
+                              child: TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context, 'Yes');
+                                  showDialog<String>(
+                                      context: context,
+                                      builder: (BuildContext context) =>
+                                          AlertDialog(
+                                            title: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                const Text(
+                                                  'Verify Action !',
+                                                  style: TextStyle(
+                                                      color: Colors.blueAccent,
+                                                      fontFamily: 'ProximaNova',
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 20.0),
+                                                ),
+                                                IconButton(
+                                                  icon: const Icon(
+                                                    Icons.close_outlined,
+                                                  ),
+                                                  onPressed: () {
+                                                    Navigator.pop(context, 'Yes');
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                            content: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                TextField(
+                                                  controller:
+                                                      _inputTextController,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                          hintText: "Confirm"),
+                                                  onChanged: (value) {
+                                                    if (value.toTitleCase() ==
+                                                        'Confirm') {
+                                                      _inputTextController
+                                                          .clear();
+
+                                                      var url =
+                                                          "http://$ipAddress/sdg/transect/deletedata.php";
+                                                      http.post(Uri.parse(url),
+                                                          body: {
+                                                            'id': list[index]
+                                                                ['id'],
+                                                          });
+                                                      Navigator.pop(context);
+                                                      Navigator.of(context)
+                                                          .pushReplacement(
+                                                        MaterialPageRoute(
+                                                          builder: (BuildContext
+                                                                  context) =>
+                                                              TransectDetails(
+                                                            countyTag: countyTag,
+                                                            beachID: beachID,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    }
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          ));
+                                },
+                                child: const Text('Yes'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ]),
-          );
-        },
-        separatorBuilder: (context, index) {
-          return const Divider(
-            thickness: 0.5,
-            indent: 20,
-            endIndent: 20,
-          );
-        },
+              ]),
+            );
+          },
+          separatorBuilder: (context, index) {
+            return const Divider(
+              thickness: 0.5,
+              indent: 20,
+              endIndent: 20,
+            );
+          },
+        ),
       );
     }
   }

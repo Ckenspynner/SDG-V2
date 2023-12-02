@@ -207,6 +207,8 @@ class _BrandItemsState extends State<BrandItems> {
           value: "HP", child: Text("Household Product (HP)")),
       const DropdownMenuItem(value: "0", child: Text("Others (O)")),
       const DropdownMenuItem(value: "PC", child: Text("Personal Care (PC)")),
+      const DropdownMenuItem(value: "FG", child: Text("Fishing Gear (FG)")),
+      const DropdownMenuItem(value: "PM", child: Text("Packaging Material (PM)")),
       const DropdownMenuItem(value: "SM", child: Text("Smoking Material (SM)")),
     ];
     return menuItems;
@@ -222,10 +224,14 @@ class _BrandItemsState extends State<BrandItems> {
           value: "HDPE", child: Text("High Density Polyethylene (HDPE)")),
       const DropdownMenuItem(
           value: "LDPE", child: Text("Low Density Polyethylene (LDPE)")),
-      const DropdownMenuItem(value: "O", child: Text("Others (O)")),
+      const DropdownMenuItem(value: "O", child: Text("Others Material (O)")),
       const DropdownMenuItem(
           value: "PET", child: Text("Polyethylene Terephthalate (PET)")),
       const DropdownMenuItem(value: "PP", child: Text("Polyethylene (PP)")),
+      const DropdownMenuItem(value: "PS", child: Text("Polystyrene (PS)")),
+      const DropdownMenuItem(value: "OP", child: Text("Other Plastic (OP)")),
+      const DropdownMenuItem(value: "CP", child: Text("Cardboard & Paper (CP)")),
+      const DropdownMenuItem(value: "M", child: Text("Metal (M)")),
       const DropdownMenuItem(
           value: "PVC", child: Text("Polyvinylchloride (PVC)")),
     ];
@@ -1648,12 +1654,12 @@ class _BrandItemsState extends State<BrandItems> {
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           // color: Colors.black38,
-          color: darkBlue,
+          color: Colors.white,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Center(
-                child: LoadingAnimationWidget.dotsTriangle(
+                child: LoadingAnimationWidget.threeRotatingDots(
                   size: 50,
                   color: Colors.blue,
                 ),

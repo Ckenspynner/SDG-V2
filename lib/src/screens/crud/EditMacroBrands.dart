@@ -979,12 +979,12 @@ class _EditState extends State<EditMacroBrand> {
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           // color: Colors.black38,
-          color: darkBlue,
+          color: Colors.white,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Center(
-                child: LoadingAnimationWidget.dotsTriangle(
+                child: LoadingAnimationWidget.threeRotatingDots(
                   size: 50,
                   color: Colors.blue,
                 ),
@@ -1244,6 +1244,11 @@ class _EditState extends State<EditMacroBrand> {
 
                       //print(_manufacturerinputString);
                       editData();
+
+                      Future.delayed(Duration.zero,
+                              () async {
+                            loader();
+                          });
 
                       //Navigator.of(context).pop();
                       Navigator.of(context).pushReplacement(

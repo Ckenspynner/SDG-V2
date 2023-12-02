@@ -54,12 +54,12 @@ class _EditState extends State<Edit> {
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           // color: Colors.black38,
-          color: darkBlue,
+          color: Colors.white,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Center(
-                child: LoadingAnimationWidget.dotsTriangle(
+                child: LoadingAnimationWidget.threeRotatingDots(
                   size: 50,
                   color: Colors.blue,
                 ),
@@ -85,24 +85,26 @@ class _EditState extends State<Edit> {
     OverlayLoadingProgress.stop();
   }
 
+  var ScreenSize;
+
   @override
   Widget build(BuildContext context) {
+    ScreenSize = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-            onPressed: () {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (BuildContext context) => const CountyDetails(),
-                ),
-              );
-            },
-            icon: const Icon(
-              Icons.arrow_back,
-              //color: Colors.black,
-            ),
+          onPressed: () {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (BuildContext context) => const CountyDetails(email: '',),
+              ),
+            );
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            //color: Colors.black,
           ),
-
+        ),
         centerTitle: true,
         title: Text('Edit ${widget.list[widget.index]['beach']} Details'),
       ),
@@ -110,9 +112,13 @@ class _EditState extends State<Edit> {
         padding: EdgeInsets.all(MediaQuery.of(context).size.width / 10),
         child: ListView(
           children: <Widget>[
-            SizedBox(
-              height: MediaQuery.of(context).size.width / 3,
-            ),
+            ScreenSize >= 800
+                ? SizedBox(
+                    height: MediaQuery.of(context).size.height / 6,
+                  )
+                : SizedBox(
+                    height: MediaQuery.of(context).size.width / 3,
+                  ),
             TextField(
               controller: controllerCounty,
               decoration: const InputDecoration(hintText: 'Enter County Name'),
@@ -135,7 +141,7 @@ class _EditState extends State<Edit> {
                 });
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
-                    builder: (BuildContext context) => const CountyDetails(),
+                    builder: (BuildContext context) => const CountyDetails(email: '',),
                   ),
                 );
               },

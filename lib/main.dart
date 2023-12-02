@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:get/get_navigation/src/routes/transitions_type.dart';
 import 'package:sdg/src/screens/splash_screen/Splashscreen.dart';
+import 'package:sdg/src/screens/splash_screen/SplashscreenLoggedIn.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 const Color darkBlue = Color.fromARGB(255, 18, 32, 47);
 
@@ -17,8 +19,13 @@ extension StringCasingExtension on String {
       .join(' ');
 }
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  //runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  var email = prefs.getString('email');
+  var password = prefs.getString('password');
+  runApp(email == null && password == null ? const MyApp() : const Logged());
 }
 
 class MyApp extends StatelessWidget {
@@ -27,11 +34,25 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      theme: ThemeData.dark().copyWith(scaffoldBackgroundColor: darkBlue),
+      //theme: ThemeData.dark().copyWith(scaffoldBackgroundColor: darkBlue),
+      theme: ThemeData(
+        brightness: Brightness.light,
+        primaryColor: Colors.green,
+        hintColor: Colors.deepOrangeAccent,
+        fontFamily: 'Roboto',
+
+        //text styling
+        //     textTheme: TextTheme(
+        //     headline1: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
+        // headline6: TextStyle(fontSize: 36.0, fontStyle: FontStyle.italic),
+        // bodyText2: TextStyle(fontSize: 14.0, fontFamily: 'Hind'),
+        // )
+      ),
       debugShowCheckedModeBanner: false,
       defaultTransition: Transition.leftToRightWithFade,
       transitionDuration: const Duration(milliseconds: 500),
       home: const Scaffold(
+        //body: Center(child: Logged()),
         body: Center(child: MyHomePage()),
         //body: Center(child: MyDropdown()),
       ),
@@ -39,20 +60,37 @@ class MyApp extends StatelessWidget {
   }
 }
 
+class Logged extends StatelessWidget {
+  const Logged({super.key});
 
+  @override
+  Widget build(BuildContext context) {
+    return GetMaterialApp(
+      //theme: ThemeData.dark().copyWith(scaffoldBackgroundColor: darkBlue),
+      theme: ThemeData(
+        brightness: Brightness.light,
+        primaryColor: Colors.green,
+        hintColor: Colors.redAccent,
+        fontFamily: 'Roboto',
 
-
-
-
-
-
-
-
-
-
-
-
-
+        //text styling
+        //     textTheme: TextTheme(
+        //     headline1: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
+        // headline6: TextStyle(fontSize: 36.0, fontStyle: FontStyle.italic),
+        // bodyText2: TextStyle(fontSize: 14.0, fontFamily: 'Hind'),
+        // )
+      ),
+      debugShowCheckedModeBanner: false,
+      defaultTransition: Transition.leftToRightWithFade,
+      transitionDuration: const Duration(milliseconds: 500),
+      home: const Scaffold(
+        //body: Center(child: Logged()),
+        body: Center(child: SplashscreenLoggedIn()),
+        //body: Center(child: MyDropdown()),
+      ),
+    );
+  }
+}
 
 // import 'dart:convert';
 //
@@ -230,15 +268,3 @@ class MyApp extends StatelessWidget {
 //     );
 //   }
 // }
-
-
-
-
-
-
-
-
-
-
-
-

@@ -197,12 +197,12 @@ class _EditMacroCountState extends State<EditMacroCount> {
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           // color: Colors.black38,
-          color: darkBlue,
+          color: Colors.white,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Center(
-                child: LoadingAnimationWidget.dotsTriangle(
+                child: LoadingAnimationWidget.threeRotatingDots(
                   size: 50,
                   color: Colors.blue,
                 ),
@@ -387,6 +387,11 @@ class _EditMacroCountState extends State<EditMacroCount> {
                         _brandinputString ??= widget.listItem;
                       });
                       editData();
+
+                      Future.delayed(Duration.zero,
+                              () async {
+                            loader();
+                          });
 
                       Navigator.of(context).pushReplacement(
                         MaterialPageRoute(

@@ -9,6 +9,7 @@ import 'package:sdg/src/screens/dataview/DataView.dart';
 import 'package:http/http.dart' as http;
 
 import '../../constants/text_strings.dart';
+import '../dataview/DataViewBrand.dart';
 
 class KCategory extends StatefulWidget {
   final String selectedTransectZoneTag;
@@ -19,7 +20,7 @@ class KCategory extends StatefulWidget {
   final String startDryGPS;
   final String centerGPS;
   final String endWetGPS;
-  final double distanceInMeters;
+  final String distanceInMeters;
 
   const KCategory(
       {super.key,
@@ -55,7 +56,8 @@ class _KCategoryState extends State<KCategory> {
 
   //Get autocomplete list filter data
   Future<List> getData_kOptionsCategory() async {
-    final response = await http.get(Uri.parse("http://$ipAddress/sdg/counts/getdata.php"));
+    final response =
+        await http.get(Uri.parse("http://$ipAddress/sdg/counts/getdata.php"));
     return json.decode(response.body);
   }
 
@@ -75,26 +77,41 @@ class _KCategoryState extends State<KCategory> {
       }
     });
 
-    print(_kOptionsCategory.toSet());
+    //print(_kOptionsCategory.toSet());
   }
+
+  var ScreenSize;
 
   @override
   Widget build(BuildContext context) {
-    //print(widget.countyID);
+    ScreenSize = MediaQuery.of(context).size.width;
+     print(widget.distanceInMeters);
     return Scaffold(
       appBar: AppBar(
         title: Text('${widget.selectedTransectZoneTag} Zone'),
+        centerTitle: true,
+        elevation: 0,
       ),
       body: SafeArea(
         child: GridView.builder(
-          padding: const EdgeInsets.all(16),
+          padding: ScreenSize >= 800
+              ? EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height / 8,
+                  bottom: MediaQuery.of(context).size.height / 8,
+                  left: MediaQuery.of(context).size.width / 4,
+                  right: MediaQuery.of(context).size.width / 4)
+              : EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height / 7,
+                  bottom: MediaQuery.of(context).size.height / 7,
+                  left: 16,
+                  right: 16),
           itemCount: category.length,
           itemBuilder: (BuildContext context, int index) {
             return buildCard(index);
           },
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
-            childAspectRatio: 1.0 / 1.3,
+            childAspectRatio: 1.0 / 1.2,
             mainAxisSpacing: 20.0,
             crossAxisSpacing: 20.0,
           ),
@@ -107,47 +124,91 @@ class _KCategoryState extends State<KCategory> {
     bool tapped = index == tapped_index;
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => CategoryItems(
-                  selectedCategoryTag: category[index].title,
-                  selectedCategoryTransectTag: widget.selectedTransectTag,
-                  transectID: widget.transectID,
-                  countyID: widget.countyID,
-                  beachID: widget.beachID,
-                  startDryGPS: widget.startDryGPS,
-                  centerGPS: widget.centerGPS,
-                  endWetGPS: widget.endWetGPS,
-                  zone: widget.selectedTransectZoneTag,
-                  distanceInMeters: widget.distanceInMeters,
-                )));
-        setState(() {
-          tapped_index = index;
-        });
-        //print(widget.transectID);
-      },
-      onLongPress: () {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => DataViewsCounts(
-                  beachID: widget.beachID,
-                  transect: widget.transectID,
-                )));
-        //print('Index $index long pressed');
-      },
-      onDoubleTap: () {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => //const CategoryItems()
-                BrandItems(
-                    selectedBrandTag: 'Branding Page',
-                    selectedBrandTransectTag: '',
+        if (index == 0) {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => CategoryItems(
+                    selectedCategoryTag: category[index].title,
+                    selectedCategoryTransectTag: widget.selectedTransectTag,
+                    transectID: widget.transectID,
                     countyID: widget.countyID,
                     beachID: widget.beachID,
+                    startDryGPS: widget.startDryGPS,
+                    centerGPS: widget.centerGPS,
+                    endWetGPS: widget.endWetGPS,
                     zone: widget.selectedTransectZoneTag,
-                    transect: widget.transectID)));
+                    distanceInMeters: widget.distanceInMeters,
+                  )));
+          setState(() {
+            tapped_index = index;
+          });
+          print(widget.beachID);
+        }
+        if (index == 1) {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => //const CategoryItems()
+                  BrandItems(
+                      selectedBrandTag: 'Branding Page',
+                      selectedBrandTransectTag: '',
+                      countyID: widget.countyID,
+                      beachID: widget.beachID,
+                      zone: widget.selectedTransectZoneTag,
+                      transect: widget.transectID)));
+          setState(() {
+            tapped_index = index;
+          });
+        }
+        if (index == 2) {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => DataViewsCounts(
+                    beachID: widget.beachID,
+                    transect: widget.transectID,
+                  )));
+          // print(widget.beachID);
+          // print(widget.transectID);
+          setState(() {
+            tapped_index = index;
+          });
+          //print('Index $index long pressed');
+        }
+        if (index == 3) {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (BuildContext context) => DataViewsBrand(
+                beachID: widget.beachID,
+                transect: widget.transectID,
+              ),
+            ),
+          );
+          setState(() {
+            tapped_index = index;
+          });
+        }
       },
+      //   onLongPress: () {
+      // if(index==2){
+      //     Navigator.of(context).push(MaterialPageRoute(
+      //         builder: (context) => DataViewsCounts(
+      //               beachID: widget.beachID,
+      //               transect: widget.transectID,
+      //             )));
+      //     //print('Index $index long pressed');
+      //   }},
+      //   onDoubleTap: () {
+      // if(index==1) {
+      //   Navigator.of(context).push(MaterialPageRoute(
+      //       builder: (context) => //const CategoryItems()
+      //       BrandItems(
+      //           selectedBrandTag: 'Branding Page',
+      //           selectedBrandTransectTag: '',
+      //           countyID: widget.countyID,
+      //           beachID: widget.beachID,
+      //           zone: widget.selectedTransectZoneTag,
+      //           transect: widget.transectID)));
+      // }},
       child: Container(
         decoration: BoxDecoration(
           border: Border.all(
-            color: tapped ? mainColor : Colors.white10,
+            color: tapped ? mainColor : Colors.white,
             style: BorderStyle.solid,
             width: 5.0,
           ),
@@ -158,6 +219,10 @@ class _KCategoryState extends State<KCategory> {
           children: <Widget>[
             Align(
               alignment: AlignmentDirectional.center,
+              // child: Image.network(
+              //   category[index].pictures,
+              //   width: MediaQuery.of(context).size.height / 5,
+              // ),
               child: Image.asset(
                 category[index].pictures,
                 width: MediaQuery.of(context).size.width / 5,
@@ -166,7 +231,9 @@ class _KCategoryState extends State<KCategory> {
             Align(
               alignment: AlignmentDirectional.bottomCenter,
               child: Container(
-                height: MediaQuery.of(context).size.width / 8,
+                height: ScreenSize >= 800
+                    ? MediaQuery.of(context).size.width / 14
+                    : MediaQuery.of(context).size.width / 8,
                 decoration: const BoxDecoration(
                   borderRadius: BorderRadius.only(
                       bottomRight: Radius.circular(15.0),

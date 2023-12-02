@@ -1,16 +1,19 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:sdg/main.dart';
+import 'package:sdg/src/screens/county/countydetails.dart';
 
 import '../login/logins.dart';
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+class SplashscreenLoggedIn extends StatefulWidget {
+  const SplashscreenLoggedIn({super.key});
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _SplashscreenLoggedInState createState() => _SplashscreenLoggedInState();
 }
-class _MyHomePageState extends State<MyHomePage> {
+class _SplashscreenLoggedInState extends State<SplashscreenLoggedIn> {
   @override
   void initState() {
     super.initState();
@@ -18,8 +21,8 @@ class _MyHomePageState extends State<MyHomePage> {
             ()=>Navigator.pushReplacement(context,
             MaterialPageRoute(builder:
                 (context) =>
-                    //const CountyDetails()
-                    const Login()
+                    const CountyDetails(email: '',)
+                    //const Login()
             )
         )
     );
@@ -38,7 +41,7 @@ class _MyHomePageState extends State<MyHomePage> {
           //     color: Colors.blue,
           //   ),
           // ),
-          //=============================================================Web
+          //==========================================================web
           // Center(
           //   child: Image.network(
           //     "https://mspwarehouse.s3.amazonaws.com/bin.gif",
@@ -46,7 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
           //     width: 125.0,
           //   ),
           // ),
-          //============================================================Android
+          //==========================================================Android
           Center(
             child: Image.asset(
               "assets/itemclasses/bin.gif",

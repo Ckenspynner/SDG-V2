@@ -8,10 +8,13 @@ import 'package:sdg/src/constants/text_strings.dart';
 import 'dart:convert';
 
 import 'package:sdg/src/screens/crud/editdata.dart';
+import 'package:sdg/src/screens/login/logins.dart';
 import 'package:sdg/src/screens/transect/transectdetails.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CountyDetails extends StatefulWidget {
-  const CountyDetails({Key? key}) : super(key: key);
+  final String email;
+  const CountyDetails({Key? key, required this.email}) : super(key: key);
 
   @override
   State<CountyDetails> createState() => _CountyDetailsState();
@@ -634,7 +637,7 @@ class _CountyDetailsState extends State<CountyDetails> {
               onPressed: () {
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
-                    builder: (BuildContext context) => const CountyDetails(),
+                    builder: (BuildContext context) => CountyDetails(email: widget.email,),
                   ),
                 );
               },
@@ -657,7 +660,19 @@ class _CountyDetailsState extends State<CountyDetails> {
         future: getData(),
         builder: ((context, snapshot) {
           if (snapshot.hasError) {
-            print('error');
+            //print('error');
+            return Center(
+              child: Column(
+                children: [
+                  Image.network(
+                    "https://mspwarehouse.s3.amazonaws.com/bin.gif",
+                    height: 125.0,
+                    width: 125.0,
+                  ),
+                  const Text('Someting went wrong\nMake sure you have an Internet Connection',textAlign: TextAlign.center,style: TextStyle(color: Colors.red),),
+                ],
+              ),
+            );
           }
           if (snapshot.hasData) {
             return BeachItems(list: snapshot.data ?? []);
@@ -783,12 +798,12 @@ class _BeachItemsState extends State<BeachItems> {
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           // color: Colors.black38,
-          color: darkBlue,
+          color: Colors.white,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Center(
-                child: LoadingAnimationWidget.dotsTriangle(
+                child: LoadingAnimationWidget.threeRotatingDots(
                   size: 50,
                   color: Colors.blue,
                 ),
@@ -816,23 +831,56 @@ class _BeachItemsState extends State<BeachItems> {
 
   //Text('Press the + button to add a beach'),
 
+  Future<void> loggedAcountNumber() async {
+
+    SharedPreferences pref =await SharedPreferences.getInstance();
+    pref.remove('email');
+    pref.remove('password');
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        //backgroundColor: Colors.grey,
-        backgroundColor: _toggleView ? Colors.blueAccent : Colors.grey,
-        //child: const Icon(Icons.add),
-        child: _toggleView ? const Icon(Icons.close) : const Icon(Icons.add),
-        onPressed: () {
-          setState(() {
-            _toggleView = !_toggleView;
-            selectedCounty = "Select County";
-            selectedBeach = "Select Beach";
-          });
-          //print(!_toggleView);
-        },
-      ),
+        floatingActionButton: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Visibility(
+                visible: !_toggleView,
+                child: FloatingActionButton(
+                  onPressed: () {
+                    loggedAcountNumber();
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => const Login(),
+                      ),
+                    );
+                  },
+                  heroTag: null,
+                  child: const Icon(
+                      Icons.logout_outlined
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              FloatingActionButton(
+                //backgroundColor: Colors.grey,
+                backgroundColor: _toggleView ? Colors.blueAccent : Colors.grey,
+                //child: const Icon(Icons.add),
+                child: _toggleView ? const Icon(Icons.close) : const Icon(Icons.add),
+                onPressed: () {
+                  setState(() {
+                    _toggleView = !_toggleView;
+                    selectedCounty = "Select County";
+                    selectedBeach = "Select Beach";
+                  });
+                  //print(!_toggleView);
+                },
+              ),
+            ]
+        ),
       body: Container(
         padding: const EdgeInsets.only(
           top: 10,
@@ -880,9 +928,13 @@ class _BeachItemsState extends State<BeachItems> {
                         )),
                       ),
                       title: Text(
-                          widget.list[widget.list.length - 1 - index]['beach']),
-                      subtitle: Text(widget.list[widget.list.length - 1 - index]
-                          ['county']),
+                        widget.list[widget.list.length - 1 - index]['beach'],
+                        textAlign: TextAlign.center,
+                      ),
+                      subtitle: Text(
+                        widget.list[widget.list.length - 1 - index]['county'],
+                        textAlign: TextAlign.center,
+                      ),
                       trailing: Wrap(
                         spacing: -16,
                         children: [
@@ -946,7 +998,7 @@ class _BeachItemsState extends State<BeachItems> {
                                               MaterialPageRoute(
                                                 builder:
                                                     (BuildContext context) =>
-                                                        const CountyDetails(),
+                                                        const CountyDetails(email: '',),
                                               ),
                                             );
                                           },
@@ -1091,7 +1143,7 @@ class _BeachItemsState extends State<BeachItems> {
                                         Navigator.of(context).pushReplacement(
                                           MaterialPageRoute(
                                             builder: (BuildContext context) =>
-                                                const CountyDetails(),
+                                                const CountyDetails(email: '',),
                                           ),
                                         );
                                         // print(
@@ -1136,439 +1188,3 @@ class _BeachItemsState extends State<BeachItems> {
     //}
   }
 }
-
-// import 'package:flutter/material.dart';
-// import 'package:sdg/src/screens/transect/transectdetails.dart';
-//
-// class CountyDetails extends StatefulWidget {
-//   const CountyDetails({super.key});
-//
-//   @override
-//   _CountyDetailsState createState() => _CountyDetailsState();
-// }
-//
-// class _CountyDetailsState extends State<CountyDetails> {
-//   final List<String> county = <String>[];
-//   final List<String> beachID = <String>[];
-//
-//   TextEditingController countyController = TextEditingController();
-//   TextEditingController beachIdController = TextEditingController();
-//
-//   String selectedCounty = "Select County";
-//   String selectedBeach = "Select Beach";
-//
-//   final _dropdownFormKey = GlobalKey<FormState>();
-//
-//   void addItemToList() {
-//     setState(() {
-//       county.insert(0, selectedCounty); //countyController.text);
-//       beachID.insert(0, selectedBeach);
-//     });
-//   }
-//
-//   //Dropdown parameters definition
-//   List<DropdownMenuItem<String>> get dropdownCountyItems {
-//     List<DropdownMenuItem<String>> menuItems = [
-//       const DropdownMenuItem(
-//           value: "Select County", child: Text("Select County")),
-//       const DropdownMenuItem(
-//           value: "Mombasa County", child: Text("Mombasa County")),
-//       const DropdownMenuItem(
-//           value: "Kilifi County", child: Text("Kilifi County")),
-//       const DropdownMenuItem(value: "Lamu County", child: Text("Lamu County")),
-//     ];
-//     return menuItems;
-//   }
-//
-//   //Dropdown parameters definition
-//   List<DropdownMenuItem<String>> get dropdownBeachItems {
-//     List<DropdownMenuItem<String>> menuItems = [
-//       const DropdownMenuItem(
-//           value: "Select Beach", child: Text("Select Beach")),
-//       const DropdownMenuItem(
-//           value: "Shimoni Beach", child: Text("Shimoni Beach")),
-//       const DropdownMenuItem(value: "Gazi Beach", child: Text("Gazi Beach")),
-//       const DropdownMenuItem(
-//           value: "Tradewinds Beach", child: Text("Tradewinds Beach")),
-//       const DropdownMenuItem(
-//           value: "Mkomani Beach", child: Text("Mkomani Beach")),
-//       const DropdownMenuItem(value: "Nyali Beach", child: Text("Nyali Beach")),
-//       const DropdownMenuItem(
-//           value: "Malindi Jetty Beach", child: Text("Malindi Jetty Beach")),
-//       const DropdownMenuItem(
-//           value: "Bandarini Beach", child: Text("Bandarini Beach")),
-//       const DropdownMenuItem(
-//           value: "Kijangwani Beach", child: Text("Kijangwani Beach")),
-//     ];
-//     return menuItems;
-//   }
-//
-//   // This function is triggered when the floating buttion is pressed
-//   void _show(BuildContext ctx) {
-//     showModalBottomSheet(
-//       shape: const RoundedRectangleBorder(
-//         borderRadius: BorderRadius.vertical(top: Radius.circular(30.0)),
-//       ),
-//       isScrollControlled: true,
-//       elevation: 5,
-//       context: ctx,
-//       builder: (ctx) => Padding(
-//           padding: EdgeInsets.only(
-//               top: 25,
-//               left: 25,
-//               right: 25,
-//               bottom: MediaQuery.of(ctx).viewInsets.bottom + 15),
-//           child: Form(
-//             key: _dropdownFormKey,
-//             child: Column(
-//               mainAxisSize: MainAxisSize.min,
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 const SizedBox(
-//                   height: 15,
-//                 ),
-//                 const Center(
-//                     child: Text(
-//                   'Transect Details',
-//                   style: TextStyle(
-//                       //color: Colors.white,
-//                       fontFamily: 'ProximaNova',
-//                       fontWeight: FontWeight.bold,
-//                       //fontStyle: FontStyle.italic,
-//                       fontSize: 20.0),
-//                 )),
-//                 const SizedBox(
-//                   height: 30,
-//                 ),
-//                 DropdownButtonFormField(
-//                     decoration: InputDecoration(
-//                       enabledBorder: OutlineInputBorder(
-//                         borderSide:
-//                             const BorderSide(color: Colors.blue, width: 2),
-//                         borderRadius: BorderRadius.circular(20),
-//                       ),
-//                       border: OutlineInputBorder(
-//                         borderSide:
-//                             const BorderSide(color: Colors.blue, width: 2),
-//                         borderRadius: BorderRadius.circular(20),
-//                       ),
-//                       filled: true,
-//                       fillColor: Colors.transparent,
-//                     ),
-//                     validator: (value) =>
-//                         value == "Select County" ? "Select a county" : null,
-//                     //dropdownColor: Colors.blueAccent,
-//                     value: selectedCounty,
-//                     icon: const Icon(Icons.keyboard_arrow_down),
-//                     onChanged: (String? newValue) {
-//                       setState(() {
-//                         selectedCounty = newValue!;
-//                       });
-//                     },
-//                     items: dropdownCountyItems),
-//                 const SizedBox(
-//                   height: 30,
-//                 ),
-//                 DropdownButtonFormField(
-//                     decoration: InputDecoration(
-//                       enabledBorder: OutlineInputBorder(
-//                         borderSide:
-//                             const BorderSide(color: Colors.blue, width: 2),
-//                         borderRadius: BorderRadius.circular(20),
-//                       ),
-//                       border: OutlineInputBorder(
-//                         borderSide:
-//                             const BorderSide(color: Colors.blue, width: 2),
-//                         borderRadius: BorderRadius.circular(20),
-//                       ),
-//                       filled: true,
-//                       fillColor: Colors.transparent,
-//                     ),
-//                     validator: (value) =>
-//                         value == "Select Beach" ? "Select a beach" : null,
-//                     //dropdownColor: Colors.blueAccent,
-//                     value: selectedBeach,
-//                     icon: const Icon(Icons.keyboard_arrow_down),
-//                     onChanged: (String? newValue) {
-//                       setState(() {
-//                         selectedBeach = newValue!;
-//                       });
-//                     },
-//                     items: dropdownBeachItems),
-//                 const SizedBox(
-//                   height: 20,
-//                 ),
-//                 Row(
-//                   children: [
-//                     Expanded(
-//                       child: ElevatedButton(
-//                           onPressed: () {
-//                             // addItemToList();
-//                             // Navigator.pop(
-//                             //   context,
-//                             //   "This string will be passed back to the parent",
-//                             // );
-//                             // setState(() {
-//                             //   selectedCounty = '';
-//                             //   selectedBeach = '';
-//                             // });
-//
-//                             if (_dropdownFormKey.currentState!.validate()) {
-//                               addItemToList();
-//                               //valid flow
-//                               Navigator.pop(
-//                                 context,
-//                                 "This string will be passed back to the parent",
-//                               );
-//                               setState(() {
-//                                 selectedCounty = "Select County";
-//                                 selectedBeach = "Select Beach";
-//                               });
-//                             }
-//                           },
-//                           child: const Text('Submit')),
-//                     ),
-//                   ],
-//                 )
-//               ],
-//             ),
-//           )),
-//
-//       // Column(
-//       //   mainAxisSize: MainAxisSize.min,
-//       //   crossAxisAlignment: CrossAxisAlignment.start,
-//       //   children: [
-//       //     const SizedBox(
-//       //       height: 15,
-//       //     ),
-//       //     const Center(
-//       //         child: Text(
-//       //           'County Details',
-//       //           style: TextStyle(
-//       //             //color: Colors.white,
-//       //               fontFamily: 'ProximaNova',
-//       //               fontWeight: FontWeight.bold,
-//       //               //fontStyle: FontStyle.italic,
-//       //               fontSize: 20.0),
-//       //         )),
-//       //     const SizedBox(
-//       //       height: 15,
-//       //     ),
-//       //     DropdownButtonFormField(
-//       //         decoration: InputDecoration(
-//       //           enabledBorder: OutlineInputBorder(
-//       //             borderSide: const BorderSide(
-//       //                 color: Colors.blue, width: 2),
-//       //             borderRadius: BorderRadius.circular(20),
-//       //           ),
-//       //           border: OutlineInputBorder(
-//       //             borderSide: const BorderSide(
-//       //                 color: Colors.blue, width: 2),
-//       //             borderRadius: BorderRadius.circular(20),
-//       //           ),
-//       //           filled: true,
-//       //           fillColor: Colors.transparent,
-//       //         ),
-//       //         validator: (value) => value == "Select County"
-//       //             ? "Select a transect"
-//       //             : null,
-//       //         dropdownColor: Colors.blueAccent,
-//       //         value: selectedValue,
-//       //         icon: const Icon(Icons.keyboard_arrow_down),
-//       //         onChanged: (String? newValue) {
-//       //           setState(() {
-//       //             selectedValue = newValue!;
-//       //           });
-//       //         },
-//       //         items: dropdownItems),
-//       //     const SizedBox(
-//       //       height: 30,
-//       //     ),
-//       //
-//       //     const SizedBox(
-//       //       height: 30,
-//       //     ),
-//       //     Row(
-//       //       children: [
-//       //         Expanded(
-//       //           child: ElevatedButton(
-//       //               onPressed: () {
-//       //                 addItemToList();
-//       //                 Navigator.pop(
-//       //                   context,
-//       //                   "This string will be passed back to the parent",
-//       //                 );
-//       //                 setState(() {
-//       //                   selectedCounty = 'a';
-//       //                   selectedBeach = 'a';
-//       //                 });
-//       //               },
-//       //               child: const Text('Submit')),
-//       //         ),
-//       //       ],
-//       //     )
-//       //   ],
-//       // ),
-//     );
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//         appBar: AppBar(
-//           title: const Text('Beach Details'),
-//         ),
-//
-//         floatingActionButton: Column(
-//             mainAxisAlignment: MainAxisAlignment.end,
-//             children: [
-//               FloatingActionButton(
-//                 heroTag: "btn1",
-//                 backgroundColor: Colors.grey,
-//                 onPressed: () {
-//                   //...
-//                 },
-//                 child: PopupMenuButton(
-//                   child: ClipRRect(
-//
-//                     borderRadius: BorderRadius.circular(100),
-//                     child: Container(
-//                       color: Colors.grey,
-//                       child: const Icon(Icons.download),
-//                     ),
-//                   ),
-//                   onSelected: (value) {
-//                     if (value == "download") {
-//                       // add desired output
-//                     }else if(value == "brand"){
-//                       // add desired output
-//                     }else if(value == "count"){
-//                       // add desired output
-//                     }else if(value == "upload"){
-//                       // add desired output
-//                     }
-//                   },
-//                   itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-//
-//                     const PopupMenuItem(
-//                       value: "download",
-//                       child: Row(
-//                         children: [
-//                           Padding(
-//                               padding: EdgeInsets.only(right: 8.0),
-//                               child: Icon(Icons.download)
-//                           ),
-//                           Text(
-//                             'Download from Server',
-//                             style: TextStyle(fontSize: 15),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                     const PopupMenuItem(
-//                       value: "brand",
-//                       child: Row(
-//                         children: [
-//                           Padding(
-//                               padding: EdgeInsets.only(right: 8.0),
-//                               child: Icon(Icons.logout)
-//                           ),
-//                           Text(
-//                             'Macro-Branding.xlxs',
-//                             style: TextStyle(fontSize: 15),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                     const PopupMenuItem(
-//                       value: "count",
-//                       child: Row(
-//                         children: [
-//                           Padding(
-//                               padding: EdgeInsets.only(right: 8.0),
-//                               child: Icon(Icons.logout)
-//                           ),
-//                           Text(
-//                             'Macro-Counts.xlxs',
-//                             style: TextStyle(fontSize: 15),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                     const PopupMenuItem(
-//                       value: "upload",
-//                       child: Row(
-//                         children: [
-//                           Padding(
-//                             padding: EdgeInsets.only(right: 8.0),
-//                             child: Icon(Icons.upload_file),
-//                           ),
-//                           Text(
-//                             'Upload to Server',
-//                             style: TextStyle(fontSize: 15),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//
-//                   ],
-//                 ),
-//               ),
-//               const SizedBox(
-//                 height: 10,
-//               ),
-//               FloatingActionButton(
-//                 heroTag: "btn2",
-//                 backgroundColor: Colors.grey,
-//                 child: const Icon(Icons.add),
-//                 onPressed: () => _show(context),
-//               ),
-//             ]
-//         ),
-//         // The bottom sheet here
-//
-//         body: Column(children: <Widget>[
-//           Expanded(
-//               child: ListView.separated(
-//             padding: const EdgeInsets.all(8),
-//             itemCount: county.length,
-//             itemBuilder: (BuildContext context, int index) {
-//               return ListTile(
-//                 leading: CircleAvatar(
-//                   radius: 25,
-//                   backgroundColor: Colors.grey,
-//                   child: Center(
-//                       child: Text(
-//                     county[county.length - 1 - index].substring(0, 1),
-//                     style: const TextStyle(
-//                       fontSize: 24,
-//                       fontFamily: 'ProximaNova',
-//                       fontWeight: FontWeight.bold,
-//                       fontStyle: FontStyle.italic,
-//                       color: Colors.white,
-//                     ),
-//                   )),
-//                 ),
-//                 title: Text(county[county.length - 1 - index]),
-//                 subtitle: Text(beachID[beachID.length - 1 - index]),
-//                 trailing: const Icon(Icons.more_vert),
-//                 onTap: () {
-//                   //print(county[county.length - 1 - index]);
-//                   Navigator.of(context).push(MaterialPageRoute(
-//                       builder: (context) => TransectDetails(
-//                           countyTag: county[county.length - 1 - index],
-//                           beachID: beachID[beachID.length - 1 - index])));
-//                 },
-//               );
-//             },
-//             separatorBuilder: (context, index) {
-//               return const Divider(
-//                 thickness: 0.5,
-//                 indent: 20,
-//                 endIndent: 20,
-//               );
-//             },
-//           ))
-//         ]));
-//   }
-// }

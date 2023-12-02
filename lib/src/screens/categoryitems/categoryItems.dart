@@ -20,7 +20,7 @@ class CategoryItems extends StatefulWidget {
   final String centerGPS;
   final String endWetGPS;
   final String zone;
-  final double distanceInMeters;
+  final String distanceInMeters;
 
   const CategoryItems({
     Key? key,
@@ -72,6 +72,8 @@ class _CategoryItemsState extends State<CategoryItems> {
           value: "Processed Wood", child: Text("Processed Wood")),
       const DropdownMenuItem(
           value: "Clothing - Covid", child: Text("Clothing - Covid")),
+      const DropdownMenuItem(
+          value: "Clothing - Covid", child: Text("Clothing")),
       const DropdownMenuItem(value: "E - Waste", child: Text("E - Waste")),
       const DropdownMenuItem(value: "Plastic", child: Text("Plastic")),
       const DropdownMenuItem(value: "Rubber", child: Text("Rubber")),
@@ -450,7 +452,7 @@ class _CategoryItemsState extends State<CategoryItems> {
                                 if (value!.isEmpty) {
                                   return "Enter Total Weight";
                                 } else {
-                                  if (int.parse(controllerWeight.text) < 0) {
+                                  if (double.parse(controllerWeight.text) < 0) {
                                     return "Total Weight can't be Less than 0";
                                   } else {
                                     return null;
@@ -577,12 +579,12 @@ class _CategoryItemsState extends State<CategoryItems> {
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           // color: Colors.black38,
-          color: darkBlue,
+          color: Colors.white,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Center(
-                child: LoadingAnimationWidget.dotsTriangle(
+                child: LoadingAnimationWidget.threeRotatingDots(
                   size: 50,
                   color: Colors.blue,
                 ),
@@ -631,7 +633,7 @@ class _CategoryItemsState extends State<CategoryItems> {
     //print('$_itemName ,$selectedCategory ,${controllerWeight.text} ,${controllerCount.text}');
   }
 
-  var itemRowCount;
+  var itemRowCount = 0;
 
   Future<List> getData() async {
     var url = "http://$ipAddress/sdg/kcounts/getdata.php";
@@ -642,8 +644,21 @@ class _CategoryItemsState extends State<CategoryItems> {
     var responsedata = jsonDecode(response.body);
 
     setState(() {
+      //var item
+      // for (int i = 0; i < responsedata.length; i++) {
+      //   if(responsedata[i]['BeachID'] == widget.beachID){
+      //     //do stuff
+      //     // print(widget.transectID);
+      //     // print(widget.beachID);
+      //     itemRowCount ++;
+      //     // print(itemRowCount);
+      //   }else{
+      //     //do another stuff
+      //   }
+      // }
       itemRowCount = responsedata.length;
     });
+
     return json.decode(response.body);
   }
 

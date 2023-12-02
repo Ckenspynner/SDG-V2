@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:sdg/src/constants/text_strings.dart';
 import 'package:sdg/src/screens/crud/EditMacroBrands.dart';
 import 'dart:convert';
@@ -32,7 +33,7 @@ class _DataViewsBrandState extends State<DataViewsBrand> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Micro-Branding-Data'),
+        title: const Text('Macro-Branding-Data'),
         actions: [
           Container(
             margin: const EdgeInsets.only(
@@ -65,12 +66,28 @@ class _DataViewsBrandState extends State<DataViewsBrand> {
         future: getData(),
         builder: ((context, snapshot) {
           if (snapshot.hasError) {
-            print('error');
+            //print('error');
+            return Center(
+              child: Column(
+                children: [
+                  Image.network(
+                    "https://mspwarehouse.s3.amazonaws.com/bin.gif",
+                    height: 125.0,
+                    width: 125.0,
+                  ),
+                  const Text('Someting went wrong\nMake sure you have an Internet Connection',textAlign: TextAlign.center,style: TextStyle(color: Colors.red),),
+                ],
+              ),
+            );
           }
           if (snapshot.hasData) {
             return Items(list: snapshot.data ?? []);
           } else {
-            return const Center(child: CircularProgressIndicator());
+            //return const Center(child: CircularProgressIndicator());
+            return Center(child: LoadingAnimationWidget.threeRotatingDots(
+              size: 50,
+              color: Colors.blue,
+            ),);
           }
         }),
       ),

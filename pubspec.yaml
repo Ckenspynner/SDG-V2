@@ -45,6 +45,7 @@ dependencies:
   http: ^1.1.0
   get: ^4.6.5
   geolocator: ^10.0.0
+  shared_preferences:
   liquid_pull_to_refresh: ^3.0.1
   autocomplete_textfield: ^2.0.1
 

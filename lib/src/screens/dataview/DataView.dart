@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:sdg/src/constants/text_strings.dart';
 import 'package:sdg/src/screens/crud/EditMacroCount.dart';
 import 'dart:convert';
@@ -27,6 +28,9 @@ class _DataViewsCountsState extends State<DataViewsCounts> {
       'beachID': widget.beachID,
     });
 
+    //print(response.body);
+    // print(widget.beachID);
+    // print(widget.transect);
     return json.decode(response.body);
   }
 
@@ -34,7 +38,7 @@ class _DataViewsCountsState extends State<DataViewsCounts> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Micro-Counts-Data'),
+        title: const Text('Macro-Counts-Data'),
         actions: [
           IconButton(
             onPressed: () {
@@ -49,30 +53,30 @@ class _DataViewsCountsState extends State<DataViewsCounts> {
               //color: Colors.black,
             ),
           ),
-          Container(
-            margin: const EdgeInsets.only(
-              right: 20,
-            ),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: IconButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => DataViewsBrand(
-                      beachID: widget.beachID,
-                      transect: widget.transect,
-                    ),
-                  ),
-                );
-              },
-              icon: const Icon(
-                Icons.arrow_forward,
-                //color: Colors.black,
-              ),
-            ),
-          ),
+          // Container(
+          //   margin: const EdgeInsets.only(
+          //     right: 20,
+          //   ),
+          //   decoration: BoxDecoration(
+          //     borderRadius: BorderRadius.circular(10),
+          //   ),
+          //   child: IconButton(
+          //     onPressed: () {
+          //       Navigator.of(context).push(
+          //         MaterialPageRoute(
+          //           builder: (BuildContext context) => DataViewsBrand(
+          //             beachID: widget.beachID,
+          //             transect: widget.transect,
+          //           ),
+          //         ),
+          //       );
+          //     },
+          //     icon: const Icon(
+          //       Icons.arrow_forward,
+          //       //color: Colors.black,
+          //     ),
+          //   ),
+          // ),
         ],
         centerTitle: true,
       ),
@@ -80,12 +84,29 @@ class _DataViewsCountsState extends State<DataViewsCounts> {
         future: getData(),
         builder: ((context, snapshot) {
           if (snapshot.hasError) {
-            print('error');
+            //print('error');
+            return Center(
+              child: Column(
+                children: [
+                  Image.network(
+                    "https://mspwarehouse.s3.amazonaws.com/bin.gif",
+                    height: 125.0,
+                    width: 125.0,
+                  ),
+                  const Text('Someting went wrong\nMake sure you have an Internet Connection',textAlign: TextAlign.center,style: TextStyle(color: Colors.red),),
+                ],
+              ),
+            );
           }
           if (snapshot.hasData) {
             return Items(list: snapshot.data ?? []);
-          } else {
-            return const Center(child: CircularProgressIndicator());
+          }
+          else {
+            //return const Center(child: CircularProgressIndicator());
+            return Center(child: LoadingAnimationWidget.threeRotatingDots(
+              size: 50,
+              color: Colors.blue,
+            ),);
           }
         }),
       ),
@@ -173,6 +194,18 @@ class Items extends StatelessWidget {
                     ),
                     DataColumn(
                       label: Text(
+                        'Distance',
+                        style: TextStyle(fontStyle: FontStyle.italic),
+                      ),
+                    ),
+                    DataColumn(
+                      label: Text(
+                        'Width',
+                        style: TextStyle(fontStyle: FontStyle.italic),
+                      ),
+                    ),
+                    DataColumn(
+                      label: Text(
                         'Weight',
                         style: TextStyle(fontStyle: FontStyle.italic),
                       ),
@@ -205,6 +238,8 @@ class Items extends StatelessWidget {
                         DataCell(Text(list[index]['Zone'] ?? '')),
                         DataCell(Text(list[index]['Category'] ?? '')),
                         DataCell(Text(list[index]['Items'] ?? '')),
+                        DataCell(Text(list[index]['Distance'] ?? '')),
+                        DataCell(Text(list[index]['Width'] ?? '')),
                         DataCell(Text(list[index]['Weight'] ?? '')),
                         DataCell(Text(list[index]['Counts'] ?? '')),
                         DataCell(
